@@ -25,7 +25,7 @@ export async function createRentals(req, res) {
                 VALUES ($1, $2, $3, $4, $5, $6, $7);`,
             [customerId, gameId, now, daysRented, null, price, null]
         );
-        res.sendStatus(201);
+        res.sendStatus(200);
     } catch (err) {
         res.status(500).send(err.message);
     }
@@ -45,7 +45,7 @@ export async function getRentals(req, res) {
 
         const object = [];
 
-        for(let i = 0; i < rentals.rows.length; i++){
+        for (let i = 0; i < rentals.rows.length; i++) {
             const actualObject = rentals.rows[i];
             object.push({
                 id: actualObject.id,
@@ -82,7 +82,11 @@ export async function endRentalsById(req, res) {
             [id]
         );
         if (rentals.rows.length <= 0) {
-            return res.sendStatus("404");
+            return res.sendStatus(404);
+        }
+
+        if (rentals.rows[0].returnDate !== null) {
+            return res.sendStatus(400);
         }
 
         const returnDate = dayjs().format("YYYY-MM-DD");
@@ -90,15 +94,15 @@ export async function endRentalsById(req, res) {
 
         const returnDateMili = new Date(returnDate).getTime();
         const getDateMili = new Date(rentals.rows[0].rentDate).getTime();
-        const oneDayMili = 1000*60*60*24;
+        const oneDayMili = 1000 * 60 * 60 * 24;
 
-        let diferenceDate = (getDateMili+(rentals.rows[0].daysRented*oneDayMili)) - returnDateMili;
+        let diferenceDate = (getDateMili + (rentals.rows[0].daysRented * oneDayMili)) - returnDateMili;
 
-        if(diferenceDate < 0){
-            const price = rentals.rows[0].originalPrice/rentals.rows[0].daysRented;
-            const days = Math.ceil((diferenceDate*(-1))/oneDayMili);
+        if (diferenceDate < 0) {
+            const price = rentals.rows[0].originalPrice / rentals.rows[0].daysRented;
+            const days = Math.ceil((diferenceDate * (-1)) / oneDayMili);
 
-                delayFee = days*price;
+            delayFee = days * price;
         }
 
         await db.query(
@@ -107,6 +111,31 @@ export async function endRentalsById(req, res) {
         );
 
         res.sendStatus(200);
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+}
+
+export async function deleteRentalsById(req, res) {
+    const { id } = req.params;
+
+    try {
+        const rentals = await db.query(
+            `SELECT * FROM rentals WHERE id = $1;`,
+            [id]
+        );
+        if (rentals.rows.length <= 0) {
+            return res.sendStatus(404);
+        }
+
+        if (rentals.rows[0].returnDate !== null) {
+            return res.sendStatus(400);
+        }
+        await db.query(
+            `DELETE FROM rentals WHERE id = $1;`,
+            [id]
+        );
+        res.send(200);
     } catch (err) {
         res.status(500).send(err.message);
     }
