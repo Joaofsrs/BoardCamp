@@ -53,7 +53,7 @@ export async function getRentals(req, res) {
                 gameId: actualObject.gameId,
                 rentDate: actualObject.rentDate,
                 daysRented: actualObject.daysRented,
-                returnDate: actualObject.returnDate, // troca pra uma data quando já devolvido
+                returnDate: actualObject.returnDate,
                 originalPrice: actualObject.originalPrice,
                 delayFee: actualObject.delayFee,
                 customer: {
