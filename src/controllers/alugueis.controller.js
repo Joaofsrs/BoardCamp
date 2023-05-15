@@ -128,7 +128,7 @@ export async function deleteRentalsById(req, res) {
             return res.sendStatus(404);
         }
 
-        if (rentals.rows[0].returnDate !== null) {
+        if (rentals.rows[0].returnDate === null) {
             return res.sendStatus(400);
         }
         await db.query(
