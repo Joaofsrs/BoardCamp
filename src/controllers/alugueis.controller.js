@@ -25,7 +25,7 @@ export async function createRentals(req, res) {
                 VALUES ($1, $2, $3, $4, $5, $6, $7);`,
             [customerId, gameId, now, daysRented, null, price, null]
         );
-        res.sendStatus(200);
+        res.sendStatus(201);
     } catch (err) {
         res.status(500).send(err.message);
     }
