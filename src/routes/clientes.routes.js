@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { createCustomer, getCustomerById, getCustomers, updateCustomerById } from "../controllers/clientes.controller.js";
+import { updateRentalsById } from "../controllers/alugueis.controller.js";
 
 const customerRouter = Router();
 
